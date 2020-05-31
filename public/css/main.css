@@ -1,0 +1,130 @@
+input[type=text], input[type=date], input[type=file], input[type=password], select, textarea {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px auto;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  input[type=submit] {
+    width: 100%;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .form-em {
+      padding: 10px;
+  }
+
+  .itemImg {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .coursefoot {
+    padding: 10px;
+  }
+
+  .courselist {
+    margin:5px;
+    border: 1px solid black;
+    padding: 0;
+  }
+
+  .coursethumb {
+    padding:0;
+  }
+
+  .enddate {
+    float: right;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .startdate {
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .coruseauthor {
+    text-align: right;
+    font-weight: 700;
+    margin-top: 22px;
+    text-transform: capitalize;
+    color: #074f82;
+  }
+
+  .dateduration {
+    min-width: 100;
+  }
+
+  .titlecard {
+    font-weight: 600;
+    font-size: 22px;
+    margin: 10px 0;
+  }
+
+  .card-body {
+    padding-top: 25px;
+    padding-bottom: 0;
+  }
+
+  .cont_but {
+    width: 100%;
+    margin: 0;
+  }
+
+  .edit_date {
+    font-weight: 600;
+    font-size: 17px;
+    float: right;
+  }
+
+  .change_date {
+    font-size: 10px;
+    margin:0;
+  }
+
+  .change_item {
+    font-size: 11px;
+    float: right;
+    margin:0;
+  }
+
+  .cdates {
+    text-align: center;
+    margin-top: 45px;
+  }
+
+  .costit {
+    font-size: 35px;
+    font-weight: 600;
+  }
+
+  .endd {
+    float: right;
+  }
+
+  .singdisc {
+    margin: 20px 0;
+  }
+
+  .lead {
+    font-weight: 600;
+  }
+
+  #cont_butt {
+    float: right;
+  }
+
+  #deltit, #deltit2, #deltit3, #deltit4 {
+    font-weight: 600;
+    color: #4287f5;
+  }
+
