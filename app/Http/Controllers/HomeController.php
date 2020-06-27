@@ -38,7 +38,7 @@ class HomeController extends Controller
             $today = $request->input('filtdate');
         }
         if (Auth::check() && Auth::user()->role->first()->name == "Admin") {
-            $courses = Course::where('start_date', '=', $today)->orderBy('created_at', 'DESC')->get();
+            $courses = Course::where('start_date', '=', $today)->where('status', '=', 1)->orderBy('created_at', 'DESC')->get();
             foreach ($courses as $course) {
                 $course->teacher = User::find($course->user_id);
                 $course->subject = Subjects::where('id', $course->subject_id)->value('subject');
@@ -52,7 +52,7 @@ class HomeController extends Controller
         }
         if (Auth::check() && Auth::user()->role->first()->name == "Student") {
             $current_class = EnrolClass::where('term_id' ,'=' ,$this->current_term['id'])->where('user_id' ,'=' ,Auth::id())->first();
-            $courses = Course::where('class_id', '=', $current_class->class_id)->where('start_date', '=', $today)->get();
+            $courses = Course::where('class_id', '=', $current_class->class_id)->where('start_date', '=', $today)->where('status', '=', 1)->get();
             foreach ($courses as $course) {
             $course->author = User::where('id', $course->user_id)->value('firstname', 'lastname');
             $course->subject = Subjects::where('id', $course->subject_id)->value('subject');
@@ -61,7 +61,7 @@ class HomeController extends Controller
             return view('dashboard', compact('courses'));
         }
         if (Auth::check() && Auth::user()->role->first()->name == "Author") {
-            $courses = Course::where('user_id', '=', Auth::id())->where('start_date', '=', $today)->get();
+            $courses = Course::where('user_id', '=', Auth::id())->where('start_date', '=', $today)->where('status', '=', 1)->get();
             foreach ($courses as $course) {
             $course->author = User::where('id', $course->user_id)->value('firstname');
             $course->subject = Subjects::where('id', $course->subject_id)->value('subject');

@@ -49,6 +49,8 @@ Route::post('/terms/complete', 'TermsController@complete');
 
 Route::post('/staffs/store', 'UserController@store');
 
+Route::post('/profile/reform', 'UserController@reform');
+
 Route::get('/class', 'ClassController@index')->name('class');
 
 Route::get('/subjects', 'SubjectController@index')->name('subjects');
@@ -71,6 +73,8 @@ Route::post('/course/store', 'CourseController@store');
 
 Route::post('/course/delete', 'CourseController@delete');
 
+Route::post('/course/softdelete', 'CourseController@softdelete');
+
 Route::resource('/course', 'CourseController')->except('index', 'show')->middleware('auth');
 
 Route::get('/course/{course}/edit', 'CourseController@edit')->name('course.edit');
@@ -87,17 +91,29 @@ Route::get('/complete/{course}', 'CourseController@complete');
 
 Route::get('/attendance/{course}', 'CourseController@attendance');
 
-Route::resource('/user', 'UserController')->except('show')->middleware('auth');
+Route::get('/user', 'UserController@index')->name('user.index');
 
 Route::get('/student', 'UserController@display')->name('student');
 
 Route::get('/profile', 'UserController@profile')->name('profile');
 
+Route::get('/profile/{user}', 'UserController@userprofile')->name('user.profile');
+
+Route::get('/profile/edit/{user}', 'UserController@editprofile')->name('profile.edit');
+
 Route::post('/student/assign', 'UserController@assign');
 
 Route::get('/student/create', 'UserController@createstudent')->name('students.create');
 
+Route::get('/user/create', 'UserController@create')->name('user.create');
+
 Route::post('/student/store', 'UserController@storestudent');
+
+Route::post('/user/delete', 'UserController@delete');
+
+Route::post('/student/harddelete', 'UserController@harddelete');
+
+Route::get('/user/edit/{staff}', 'UserController@edit');
 
 Route::get('/profile/password', 'UserController@password')->name('profile.password');
 

@@ -59,6 +59,24 @@
 
 </div>
 
+
+<div id="delmod" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Delete <span id="stud_name" style="text-transform: capitalize;"></span>'s account</h3>
+    <form action="/student/harddelete" method="POST">
+    @csrf
+        <input type="hidden" name="user_id" id="stud_id"/>
+        <input type="hidden" name="class_id" value="noclass"/>
+        <input type="submit" name="submit" value="Delete"/>
+    </form>
+  </div>
+
+</div>
+
+
 <h1 class="my-4">Students With No Class</h1>
 
 <table class="table">
@@ -68,16 +86,18 @@
             <th scope="col">Username</th>
             <th scope="col">Enrolled Date</th>
             <th>Assign Class</th>
+            <th>Delete</th>
           </tr>
         </thead>
 
         <tbody>
             @foreach ($students as $student)
                 <tr>
-                    <td>{{ $student->firstname.' '.$student->lastname }}</td>
+                    <td><span style="text-transform: capitalize;">{{ $student->firstname.' '.$student->lastname }}</span></td>
                     <td>{{ $student->username }}</td>
                     <td>{{ $student->created_at->toFormattedDateString() }}</td>
                     <td><button type="button" id="startbut" data-id="{{ $student->id }}" class="btn btn-secondary cont_but startbut">Assign Class</button></td>
+                    <td><button type="button" id="delstud" data-id="{{ $student->id }}" data-name="{{ $student->firstname.' '.$student->lastname }}" class="btn btn-secondary cont_but delstud">Delete</button></td>
                 </tr>
             @endforeach
 
@@ -89,9 +109,18 @@
             var dataId = $(this).attr("data-id");
             $('#student_id').val(dataId);
     });
+    
+    $(".delstud").on("click", function(){
+            $('#delmod').css("display", "block");
+            var dataId = $(this).attr("data-id");
+            var dataname = $(this).attr("data-name");
+            $('#stud_id').val(dataId);
+            $('#stud_name').text(dataname);
+    });
 
     $(".close").on("click", function(){
             $('#myModal').css("display", "none");
+            $('#delmod').css("display", "none");
     });
 </script>
 @endsection

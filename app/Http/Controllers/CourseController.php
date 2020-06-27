@@ -14,6 +14,7 @@ use App\Comments;
 use App\Subjects;
 use App\CourseAttendance;
 use Carbon\Carbon;
+use File;
 
 class CourseController extends Controller
 {
@@ -98,6 +99,7 @@ class CourseController extends Controller
         $input['user_id'] = Auth::id();
         $input['class_id'] = $current_class['class_id'];
         $input['description'] = $request->input('editor1');
+        $input['status'] = 1;
         $course = Course::create($input);
         \Session::flash('flash_message', 'A new course has been created!');
         $author = User::find($course->user_id);
@@ -247,6 +249,20 @@ class CourseController extends Controller
 
         $result = $course->save();
         \Session::flash('flash_message', 'Course has been updated successfully by you.');
+        }
+        return redirect(route('home'));
+    }
+
+    public function softdelete(Request $request)
+    {
+        //check is if is a user with permissions
+        if (Auth::check() && (Auth::user()->role->first()->name == 'Author')) {
+            $course = Course::find($request->input('course_id'));
+            $course->status = 0;
+            $result = $course->save();
+            File::delete('uploads/videos/' . $course->video);
+            \Session::flash('flash_message', 'Course has been deleted successfully by you.');
+        // dd($course);
         }
         return redirect(route('home'));
     }

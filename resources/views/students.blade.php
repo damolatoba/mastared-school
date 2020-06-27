@@ -50,7 +50,12 @@
             @foreach ($students as $key => $student)
                 <tr>
                     <td>{{ $key+1 }}</td>
-                    <td>{{ $student->firstname.' '.$student->lastname }}</td>
+                    @if (Auth::check() && (Auth::user()->role->first()->name == 'Author'))
+                    <td><span style="text-transform: capitalize;">{{ $student->firstname.' '.$student->lastname }}</span></td>
+                    @endif
+                    @if (Auth::check() && (Auth::user()->role->first()->name == 'Admin'))
+                    <td><span style="text-transform: capitalize;"><a href="{{url('/profile/'.$student->id)}}">{{ $student->firstname.' '.$student->lastname }}</a></span></td>
+                    @endif
                     <td>{{ $student->username }}</td>
                 </tr>
             @endforeach

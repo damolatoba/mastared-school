@@ -39,6 +39,35 @@ input[type="date"] {
   background-color: #666666;
   color: white;
 }
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  max-width: 40%;
+  text-align: center;
+}
+
+.close {
+    text-align: right;
+}
 </style>
 @if (session('flash_message'))
     <div class="card-body">
@@ -50,6 +79,23 @@ input[type="date"] {
 
 @if (Auth::check() && (Auth::user()->role->first()->name == 'Author'))
     <a href="{{ route('course.create') }}" class="btn btn-secondary" id="course_button">Add New Course</a>
+
+
+<div id="delmod" class="modal">
+
+  <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 style="color:#800000;">Please Confirm</h2>
+        <p>Are you sure you want to delete the lecture <span id="course_course" style="text-transform: capitalize;color:#cc0000;font-weight:600;"></span> from the subject <span id="course_subject" style="text-transform: capitalize;color:#cc0000;font-weight:600;"></span></p>
+        <form action="/course/softdelete" method="POST">
+        @csrf
+            <input type="hidden" name="course_id" id="course_id"/>
+            <input type="submit" name="submit" value="Delete"/>
+        </form>
+    </div>  
+
+</div>
     <div class="container" id = "coursescontent">
     <div class="row">
         <div class="col-md-12">
@@ -80,7 +126,7 @@ input[type="date"] {
                     <td><h2 class="titlecard"><a href = "{{ route('course.show', [$course->id]) }}">{{ $course['title'] }}</a></h2></td>
                     <td>{{$course->subject}}</td>
                     <td><a href="{{ route('course.edit', [$course->id]) }}" class="btn btn-secondary cont_but" id="startdate">Edit</a></td>
-                    <td><button type="button" data-id="{{ $course->id }}" data-name="{{ $course->title }}" class="btn btn-secondary cont_but" id="startdate">Delete</button></td>
+                    <td><button type="button" data-id="{{ $course->id }}" data-course="{{ $course->title }}" data-subject="{{ $course->subject }}" class="btn btn-secondary but_del" id="startdate">Delete</button></td>
                 </tr>
             @endforeach
             </table>
@@ -130,6 +176,20 @@ input[type="date"] {
     </div>
 </div>
 @endif
+<script>
+    $(".but_del").on("click", function(){
+            $('#delmod').css("display", "block");
+            var dataId = $(this).attr("data-id");
+            var dataCourse = $(this).attr("data-course");
+            var dataSubject = $(this).attr("data-subject");
+            $('#course_id').val(dataId);
+            $('#course_course').text(dataCourse);
+            $('#course_subject').text(dataSubject);
+    });
 
+    $(".close").on("click", function(){
+            $('#delmod').css("display", "none");
+    });
+</script>
 
 @endsection

@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
         $roles = UserRole::where('role_id' ,'=' ,2)->pluck('user_id')->toArray();
-        $users = User::whereIn('id', $roles)->get();
+        $users = User::whereIn('id', $roles)->where('status', '=', 1)->get();
         foreach($users as $user){
             $class_id = EnrolClass::where('term_id', '=', $this->current_term->id)->where('user_id', '=', $user->id)->value('class_id');
             $user->class = Classes::where('id', '=', $class_id)->value('class_name');
@@ -63,6 +63,21 @@ class UserController extends Controller
         return redirect(route('home'));
     }
 
+    public function userprofile(User $user){
+        if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
+            $term = $this->current_term;
+            $roles = UserRole::where('role_id' ,'=' ,2)->pluck('user_id')->toArray();
+            $class_id = EnrolClass::where('term_id', '=', $term->id)->where('user_id', '=', $user->id)->value('class_id');
+            $class = Classes::where('id', '=', $class_id)->first();
+            $teacher_id = EnrolClass::where('term_id', '=', $term->id)->where('class_id', '=', $class_id)->whereIn('user_id', $roles)->value('user_id');
+            $teacher = User::where('id', '=', $teacher_id)->first();
+
+            $class = Classes::where('id', '=', $class_id)->first();
+            return view('studentprofile', compact('user', 'term', 'class', 'teacher'));
+        }
+        return redirect(route('home'));
+    }
+
     public function password()
     {
         if (Auth::check() && (Auth::user()->role->first()->name == 'Student')) {
@@ -79,14 +94,7 @@ class UserController extends Controller
         $classed_students = EnrolClass::where('term_id' ,'=' ,$this->current_term->id)->pluck('user_id')->toArray();
         $classes = Classes::all();
 
-        $users = User::whereIn('id', $roles)->get();
-        $students = [];
-        foreach($users as $user){
-            if(!in_array($user->id, $classed_students) ){
-                array_push($students, $user);
-            }
-            
-        }
+        $students = User::whereIn('id', $roles)->whereNotIn('id', $classed_students)->where('status', '=', 1)->get();
         return view('student', compact('students', 'classes'));
         }
         return redirect(route('home'));
@@ -111,7 +119,7 @@ class UserController extends Controller
         if (Auth::check() && (Auth::user()->role->first()->name == 'Admin') || (Auth::user()->role->first()->name == 'Author')) {
         $roles = UserRole::where('role_id' ,'=' ,2)->pluck('user_id')->toArray();
         $studentslist = EnrolClass::where('term_id' ,'=' ,$this->current_term->id)->where('class_id' ,'=' ,$classes->id)->pluck('user_id')->toArray();
-        $students = User::whereIn('id', $studentslist)->whereNotIn('id', $roles)->get();
+        $students = User::whereIn('id', $studentslist)->whereNotIn('id', $roles)->where('status', '=', 1)->get();
 
 
         return view('students', compact('students'));
@@ -172,19 +180,6 @@ class UserController extends Controller
         return redirect(route('home'));
     }
 
-    // public function dashboard()
-    // {
-    //     return view('portal.dashboard');
-    // }
-
-    // public function account(User $user)
-    // {
-    //     $user = User::find(Auth::id());
-    //     $roles = Role::pluck('name', 'id');
-    //     $submitbuttontext = "Update";
-    //     return view('users.edit', compact('submitbuttontext', 'user', 'roles'));
-    // }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -224,6 +219,7 @@ class UserController extends Controller
         }
         $input = $request->all();
         $input['password'] = Hash::make('mastared@2020');
+        $input['status'] = 1;
         $user = User::create($input);
         $user->role()->attach(2);
         \Session::flash('flash_message', 'New Teacher Account Created!');
@@ -241,11 +237,35 @@ class UserController extends Controller
             return view('students.create');
         }
         $input = $request->all();
-        $input['password'] = Hash::make('welcome2mastared');
+        $input['password'] = Hash::make('welcome2mastared');  
+        $input['status'] = 1;
         $user = User::create($input);
         $user->role()->attach(3);
         \Session::flash('flash_message', 'New Student Account Created!');
         return redirect(route('student'));
+        }
+        return redirect(route('home'));
+    }
+
+    public function reform(Request $request)
+    {
+        if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
+        $usernames = User::where('id', '!=',  $request->input('user_id'))->pluck('username')->toArray();
+        if (in_array($request->input('username'), $usernames)){
+            \Session::flash('flash_message', 'Username already exist!');
+            return view('students.create');
+        }
+        $user = User::find($request->input('user_id'));
+        $user->firstname = $request->input('firstname');
+        $user->lastname = $request->input('lastname');
+        $user->mobile = $request->input('mobile');
+        $user->username = $request->input('username');
+        $result = $user->save();
+        \Session::flash('flash_message', 'Account details updated successfully!');
+        if($request->input('class_id') != null){
+            return redirect(route('students', [$request->input('class_id')]));
+        }
+            return redirect(route('user.index'));
         }
         return redirect(route('home'));
     }
@@ -261,19 +281,20 @@ class UserController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function edit(User $staff)
     {
-        if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
-        $submitbuttontext = "Update";
-        $user = User::find($id);
-        $roles = Role::pluck('name', 'id');
-        return view('users.edit', compact('submitbuttontext', 'user', 'roles'));
+        if (Auth::check() && Auth::user()->role->first()->name == "Admin" ) {
+            return view('users.edit', compact('staff'));
+        }
+        return redirect(route('home'));
+    }
+
+    public function editprofile(User $user)
+    {
+        if (Auth::check() && Auth::user()->role->first()->name == "Admin" ) {
+            $class_id = EnrolClass::where('term_id', '=', $this->current_term->id)->where('user_id', '=', $user->id)->value('class_id');
+            $class = Classes::where('id', '=', $class_id)->first();
+            return view('students.edit', compact('user', 'class'));
         }
         return redirect(route('home'));
     }
@@ -316,5 +337,34 @@ class UserController extends Controller
         return redirect(route('user.index'));
         }
         return redirect(route('home'));
+    }
+
+    public function delete(Request $request)
+    {
+        if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
+        $input = $request->all();
+        $user = User::find($request->input('user_id'));
+        $input['status'] = 0;
+        $result = $user->update($input);
+        \Session::flash('flash_message', 'Account has been deleted successfully!');
+        if($request->input('class_id') != null){
+            return redirect('students/'.$request->input('class_id'));
+        }
+        return redirect(route('user.index'));
+        }else{
+            return redirect(route('home'));
+        }
+    }
+
+    public function harddelete(Request $request)
+    {
+        if (Auth::check() && (Auth::user()->role->first()->name == 'Admin')) {
+        $user = User::find($request->input('user_id'));
+        $user->delete();
+        \Session::flash('flash_message', 'Account has been deleted successfully!');
+        return redirect(route('student'));
+        }else{
+            return redirect(route('home'));
+        }
     }
 }
