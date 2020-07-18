@@ -86,7 +86,9 @@ input[type="submit"] {
         <p><b>Username: </b>{{$personal->username}}</p>
         <p><b>Current Term: </b>{{$term->term_name}} <b> &nbsp; &nbsp; {{ date('l, d M Y',(strtotime($term->start_date))) }} &nbsp; <b>To:</b> {{ date('l, d M Y',(strtotime($term->end_date))) }}</b></p>
         @if(Auth::user()->role->first()->name == 'Author')
-            <p><b>Class: </b>{{$class->class_name}}</p>
+            @if($class['class_name'] != null)
+            <p><b>Class: </b>{{$class['class_name']}}</p>
+            @endif
         @endif
         @if(Auth::user()->role->first()->name == 'Admin')
             <p><b>Role: </b>Administrator</p>

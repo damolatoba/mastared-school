@@ -124,3 +124,16 @@ Route::get('/students', 'UserController@classlist')->name('classlist');
 Route::get('/students/{classes}', 'UserController@studetslist')->name('students');
 
 Route::get('/user/{user}/account', 'UserController@account')->name('user.account');
+
+
+
+
+
+
+Route::get('/assignment', 'AssignmentController@index')->name('assignment');
+
+// Route::get('/questions', 'AssignmentController@questions')->name('questions');
+
+Route::post('/assignment/store', 'AssignmentController@store');
+
+Route::post('/assignment/create', 'AssignmentController@create');
